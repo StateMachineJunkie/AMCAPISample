@@ -6,6 +6,9 @@ Performance is reasonable and, since this is a sample, I did not bother to perfo
 
 Before you can run the app, you will have to acquire your own vendor key from AMC's developer website. See [this](https://github.com/StateMachineJunkie/AMCAPI#setting-your-authorization-key) link for details.
 
+## ToDo
+- Add ability to play the trailer associated with the user-selected movie.
+- Add support for Apple's unified logger.
 
 ## License
 AMCAPI is released under an MIT license. See [License.md](https://github.com/StateMachineJunkie/AMCAPISample/blob/main/License.md) for more information.
