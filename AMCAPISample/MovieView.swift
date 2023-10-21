@@ -46,6 +46,8 @@ struct ScrollView<Content: View>: View {
 struct MovieView: View {
     var movieList: MovieList
 
+    @State private var isMoviePlayerPresented = false
+    @State private var movieURL: URL?
     @State private var searchText = ""
 
     private var gridItemLayout = [
@@ -64,9 +66,7 @@ struct MovieView: View {
         NavigationView {
             GeometryReader { geometry in
                 ZStack {
-                    ScrollView(axes: .vertical, showsIndicators: false, offsetChanged: {
-                        print($0)
-                    }) {
+                    ScrollView(axes: .vertical, showsIndicators: true) {
                         let width = geometry.size.width / 2
                         let height = width * 1.5
                         let gridItem = GridItem(.adaptive(minimum: width, maximum: width), spacing: 0)
@@ -76,7 +76,9 @@ struct MovieView: View {
                                     RemoteImage(url: url, resizedTo: CGSize(width: width, height: height))
                                         .frame(width: width, height: height)
                                         .gesture(TapGesture().onEnded({ _ in
-                                            print("Tap Gesture!")
+                                            if let movieURL = URL(string: movie.media.trailerMp4) {
+                                                self.movieURL = movieURL
+                                            }
                                         }))
                                 } else {
                                     ZStack {
@@ -96,10 +98,17 @@ struct MovieView: View {
                         }
                         .animation(.easeInOut(duration: 0.2), value: searchResults)
                         .searchable(text: $searchText)
-                        .refreshable {
-                            // FIXME: Currently this does nothing. I think it is intended to be used with `List` only.
-                            movieList.fetch()
-                        }
+                    }
+                    .navigationTitle(movieList.title)
+                    .sheet(isPresented: Binding(get: {
+                        movieURL != nil
+                    }, set: { _ /* booleanValue */ in
+                        // Intentionally left blank
+                    })) {
+                        MoviePlayerView(url: $movieURL)
+                    }
+                    .refreshable {
+                        movieList.fetch()
                     }
 
                     if case MovieList.FetchState.isFetching = movieList.fetchState {
@@ -107,12 +116,6 @@ struct MovieView: View {
                     }
                 }
             }
-            .navigationBarItems(leading: HStack {
-                Button("Refresh") {
-                    movieList.fetch()
-                }
-            })
-            .navigationTitle(movieList.title)
         }
         .alert("Error fetching data!", isPresented: Binding(get: {
             movieList.error != nil
