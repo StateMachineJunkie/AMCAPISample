@@ -18,7 +18,7 @@ struct MoviePlayerView: View {
 
     var body: some View {
         VStack {
-            if let url {
+            if url != nil {
                 VideoPlayer(player: player)
             } else {
                 Text("Trailer unavailable!")

@@ -111,13 +111,13 @@ struct MovieView: View {
                         movieList.fetch()
                     }
 
-                    if case MovieList.FetchState.isFetching = movieList.fetchState {
+                    if case .isFetching = movieList.fetchState {
                         ActivityIndicatorView()
                     }
                 }
             }
         }
-        .alert("Error fetching data!", isPresented: Binding(get: {
+        .alert("Failed to fetch movie info!", isPresented: Binding(get: {
             movieList.error != nil
         }, set: { _ /* newValue */ in
             // Intentionally left empty since we don't want to reset the error property until the user acknowledges the error.
@@ -126,7 +126,7 @@ struct MovieView: View {
                 movieList.error = nil
             }
         }, message: {
-            Text((movieList.error == nil ? "No details" : String(describing: movieList.error!)))
+            Text(movieList.error?.localizedDescription ?? "No details." )
         })
         .onAppear {
             movieList.fetch()
